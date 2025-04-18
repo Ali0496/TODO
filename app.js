@@ -20,7 +20,7 @@ form.addEventListener("submit", (e) => {
             <h2>${item.text}</h2>
             <div class="btn">
                 <button class="done"><i class="fa-solid fa-check"></i></button>
-                <button class="del"><i class="fa-solid fa-trash"></i></button>
+                <button id=${item.id} class="del"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>
     `;
