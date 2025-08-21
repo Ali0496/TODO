@@ -1,47 +1,67 @@
-let TODO = [];
+let TODO = JSON.parse(localStorage.getItem("todos")) || [];
 
 let wrapper = document.querySelector(".wrapper");
 let form = document.querySelector("#form");
 let input = document.querySelector("#input");
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  let tayyor = {
-    id: TODO.length + 1,
-    text: input.value,
-  };
-  TODO.unshift(tayyor);
+function renderTodos() {
   let html = "";
-
   TODO.forEach((item) => {
     html += `
-    <div class="card">
-            <h2>${item.text}</h2>
-            <div class="btn">
-                <button class="done"><i class="fa-solid fa-check"></i></button>
-                <button id=${item.id} class="del"><i class="fa-solid fa-trash"></i></button>
-            </div>
+      <div class="card">
+        <h2 class="${item.done ? "chiz" : ""}">${item.text}</h2>
+        <div class="btn">
+          <button data-id="${
+            item.id
+          }" class="done"><i class="fa-solid fa-check"></i></button>
+          <button data-id="${
+            item.id
+          }" class="del"><i class="fa-solid fa-trash"></i></button>
         </div>
+      </div>
     `;
   });
   wrapper.innerHTML = html;
-  input.value = "";
 
   let allDoneBtns = document.querySelectorAll(".done");
   allDoneBtns.forEach((doneBtn) => {
     doneBtn.addEventListener("click", (ev) => {
-      ev.target.parentElement.previousElementSibling.classList.add("chiz");
+      let id = ev.currentTarget.dataset.id;
+      TODO = TODO.map((t) => (t.id == id ? { ...t, done: !t.done } : t));
+      saveTodos();
+      renderTodos();
     });
   });
-
   let allDelBtns = document.querySelectorAll(".del");
   allDelBtns.forEach((delBtn) => {
     delBtn.addEventListener("click", (eve) => {
-      eve.target.parentElement.parentElement.style.display = "none";
-      TODO = TODO.filter((card) => card.id != eve.target.id);
+      let id = eve.currentTarget.dataset.id;
+      TODO = TODO.filter((card) => card.id != id);
+      saveTodos();
+      renderTodos();
     });
   });
+}
+
+function saveTodos() {
+  localStorage.setItem("todos", JSON.stringify(TODO));
+}
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  if (input.value.trim() === "") return;
+
+  let tayyor = {
+    id: Date.now(),
+    text: input.value,
+    done: false,
+  };
+
+  TODO.unshift(tayyor);
+  saveTodos();
+  renderTodos();
+  input.value = "";
 });
 
-//
+renderTodos();
